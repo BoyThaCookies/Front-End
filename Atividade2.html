@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Aprendendo Portugol</title>
+</head>
+<body>
+
+<h1>Portugol - Introdução à Lógica de Programação</h1>
+
+<p>
+Portugol é uma forma de pseudocódigo utilizada para ensinar lógica de programação.
+Ele utiliza comandos em português, facilitando o entendimento para iniciantes que ainda
+não conhecem linguagens como Java, Python ou C.
+</p>
+
+<p>
+O principal objetivo do Portugol é ensinar como pensar de forma lógica,
+criando algoritmos para resolver problemas passo a passo.
+</p>
+
+<hr>
+
+<h2>O que é um Algoritmo?</h2>
+
+<p>
+Um algoritmo é uma sequência de passos organizados para resolver um problema.
+Por exemplo, uma receita de bolo é um algoritmo, pois segue uma ordem lógica
+de instruções.
+</p>
+
+<hr>
+
+<h2>Estrutura Básica de um Programa em Portugol</h2>
+
+<pre>
+Algoritmo "NomeDoPrograma"
+Var
+    variavel: tipo
+Inicio
+    // comandos
+FimAlgoritmo
+</pre>
+
+<p>
+Todo programa em Portugol possui:
+</p>
+
+<ul>
+    <li><b>Algoritmo</b> – nome do programa</li>
+    <li><b>Var</b> – declaração de variáveis</li>
+    <li><b>Inicio</b> – começo das instruções</li>
+    <li><b>FimAlgoritmo</b> – final do programa</li>
+</ul>
+
+<hr>
+
+<h2>Exemplo 1: Escrevendo uma Mensagem</h2>
+
+<pre>
+Algoritmo "OlaMundo"
+Inicio
+    Escreva("Olá, mundo!")
+FimAlgoritmo
+</pre>
+
+<p>
+O comando <b>Escreva</b> serve para mostrar mensagens na tela.
+</p>
+
+<hr>
+
+<h2>Exemplo 2: Usando Variáveis</h2>
+
+<pre>
+Algoritmo "Soma"
+Var
+    num1, num2, resultado: inteiro
+Inicio
+    Leia(num1)
+    Leia(num2)
+    resultado <- num1 + num2
+    Escreva("Resultado: ", resultado)
+FimAlgoritmo
+</pre>
+
+<p>
+O comando <b>Leia</b> serve para receber dados do usuário.
+</p>
+
+<hr>
+
+<h2>Estrutura Condicional (Se...Senao)</h2>
+
+<p>
+A estrutura condicional permite que o programa tome decisões.
+</p>
+
+<pre>
+Algoritmo "MaiorIdade"
+Var
+    idade: inteiro
+Inicio
+    Leia(idade)
+    Se idade >= 18 Entao
+        Escreva("Maior de idade")
+    Senao
+        Escreva("Menor de idade")
+    FimSe
+FimAlgoritmo
+</pre>
+
+<hr>
+
+<h2>Estrutura de Repetição (Enquanto)</h2>
+
+<p>
+A estrutura de repetição permite executar comandos várias vezes.
+</p>
+
+<pre>
+Algoritmo "Contador"
+Var
+    contador: inteiro
+Inicio
+    contador <- 1
+    Enquanto contador <= 5 Faca
+        Escreva(contador)
+        contador <- contador + 1
+    FimEnquanto
+FimAlgoritmo
+</pre>
+
+<p>
+Nesse exemplo, o programa mostra os números de 1 até 5.
+</p>
+
+<hr>
+
+<h2>Teste seus conhecimentos</h2>
+
+<form action="#" method="post">
+
+<label>1) O que é um algoritmo?</label><br>
+<textarea name="pergunta1" rows="4" cols="60"></textarea>
+
+<br><br>
+
+<label>2) Qual a diferença entre "Escreva" e "Leia"?</label><br>
+<textarea name="pergunta2" rows="4" cols="60"></textarea>
+
+<br><br>
+
+<input type="submit" value="Enviar Respostas">
+
+</form>
+
+<hr>
+
+</body>
+
+</html>
