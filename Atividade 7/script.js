@@ -48,3 +48,5 @@ function alimentar(){
         },1000);
 
 }
+
+controlador();
