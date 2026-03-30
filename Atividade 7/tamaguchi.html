@@ -1,15 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tamaguchi</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bichinho Virtual 🐾</title>
+
+  <!-- DaisyUI + Tailwind -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <style>
+    /* Transição suave de fundo dia/noite */
+    body {
+      transition: background-image 2s ease-in-out;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-image: url('background.png');
+    }
+
+    /* Animação pulsante na criatura quando com fome */
+    @keyframes hungry-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px) rotate(-2deg); }
+      75% { transform: translateX(4px) rotate(2deg); }
+    }
+    .hungry { animation: hungry-shake 0.5s infinite; }
+
+    /* Bounce ao comer */
+    @keyframes eat-bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+    .eating { animation: eat-bounce 0.4s ease-in-out infinite; }
+
+    /* Coração flutuante */
+    @keyframes heart-float {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-60px) scale(1.4); }
+    }
+    .heart-anim {
+      animation: heart-float 1.2s ease-out forwards;
+      position: absolute;
+      font-size: 1.8rem;
+      pointer-events: none;
+    }
+
+    /* Estrelas noturnas animadas */
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50%       { opacity: 1;   transform: scale(1.2); }
+    }
+    .star {
+      position: fixed;
+      width: 4px; height: 4px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite;
+      pointer-events: none;
+      display: none;
+      z-index: 0;
+    }
+    body.noite .star { display: block; }
+
+    /* Barra de fome animada */
+    #hunger-bar { transition: width 0.8s ease; }
+
+    /* Morte - criatura em escala de cinza */
+    .morto { filter: grayscale(100%); opacity: 0.7; }
+
+    /* Efeito de ressurreição */
+    @keyframes revive {
+      0%   { transform: scale(0.5); opacity: 0; filter: brightness(3); }
+      60%  { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    .reviving { animation: revive 0.8s ease-out forwards; }
+  </style>
 </head>
-<body>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- Estrelas (aparecem à noite) -->
+  <div id="stars-container"></div>
+
+  <!-- ===== TOPO: Avatar + Nome + Toggle Dia/Noite ===== -->
+  <div class="w-full flex items-center justify-between p-4 gap-4 z-10">
     
-    <img id="b" src="b_n.png"/>  
-    <img id="btn" src="btn.png"/>
-      
+    <div class="flex items-center gap-3">
+      <div class="avatar">
+        <div class="w-14 rounded-full ring ring-pink-400 ring-offset-base-100 ring-offset-2 shadow-lg">
+          <img id="avatarImg" src="b_n.png" alt="Avatar" />
+        </div>
+      </div>
+      <input
+        id="nomeInput"
+        type="text"
+        placeholder="Nome da criatura..."
+        class="input input-sm input-bordered input-secondary bg-white/70 backdrop-blur-sm w-40"
+        oninput="atualizarNome()"
+      />
+    </div>
+
+    <!-- Toggle Dia / Noite -->
+    <div class="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-full px-3 py-2 shadow">
+      <span class="text-sm">☀️</span>
+      <input
+        type="checkbox"
+        id="toggleNoite"
+        class="toggle toggle-sm toggle-secondary"
+        onchange="alternarModoManual()"
+      />
+      <span class="text-sm">🌙</span>
+    </div>
+  </div>
+
+  <!-- ===== STATUS: nome + barra de fome ===== -->
+  <div class="flex flex-col items-center gap-1 z-10 px-4">
+    <p id="nomeDisplay" class="font-bold text-pink-700 text-lg drop-shadow"></p>
+    <div class="flex items-center gap-2 w-full max-w-xs">
+      <span class="text-sm">🍔</span>
+      <div class="flex-1 bg-white/60 rounded-full h-3 overflow-hidden shadow-inner">
+        <div id="hunger-bar" class="h-full rounded-full bg-gradient-to-r from-green-400 to-lime-300" style="width:100%"></div>
+      </div>
+      <span id="hunger-label" class="text-xs font-semibold text-gray-600">Saciado</span>
+    </div>
+    <div id="status-badge" class="badge badge-success badge-sm mt-1">😊 Feliz</div>
+  </div>
+
+  <!-- ===== CRIATURA ===== -->
+  <div class="flex-1 flex flex-col items-center justify-center relative z-10 py-4">
+    <div class="relative inline-block">
+      <img
+        id="mainImage"
+        src="b_n.png"
+        alt="Criatura"
+        class="w-56 max-w-xs h-auto drop-shadow-2xl transition-all duration-300 cursor-pointer"
+        onclick="interagir()"
+        title="Clique para interagir!"
+      />
+      <div id="hearts-area" class="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"></div>
+    </div>
+
+    <!-- Botão de comida -->
+    <div class="mt-8 flex flex-col items-center gap-2">
+      <p class="text-xs text-gray-500 font-medium">Clique para alimentar</p>
+      <img
+        id="btnImage"
+        src="btn.png"
+        alt="Comida"
+        class="w-24 h-auto cursor-pointer hover:scale-110 active:scale-95 transition-transform drop-shadow-lg"
+        onclick="alimentar()"
+      />
+    </div>
+  </div>
+
+  <!-- ===== RODAPÉ: Tempo + Log ===== -->
+  <div class="w-full flex justify-center pb-4 z-10">
+    <div class="bg-white/60 backdrop-blur-sm rounded-2xl px-6 py-2 shadow flex gap-6 items-center">
+      <div class="text-center">
+        <p class="text-xs text-gray-500">Tempo vivo</p>
+        <p id="timer-display" class="font-mono font-bold text-pink-600">0s</p>
+      </div>
+      <div class="divider divider-horizontal m-0"></div>
+      <div class="text-center">
+        <p class="text-xs text-gray-500">Último evento</p>
+        <p id="log-display" class="text-xs font-medium text-gray-700">Acordando...</p>
+      </div>
+    </div>
+  </div>
+
 </body>
-    <script src="script.js"></script>
+
+<script src="script.js"></script>
 </html>
