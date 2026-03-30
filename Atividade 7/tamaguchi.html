@@ -5,21 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bichinho Virtual 🐾</title>
 
-  <!-- DaisyUI + Tailwind -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
   <style>
-    /* Transição suave de fundo dia/noite */
     body {
-      transition: background-image 2s ease-in-out;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       background-image: url('background.png');
+      transition: background-image 1.5s ease-in-out;
     }
-
-    /* Animação pulsante na criatura quando com fome */
     @keyframes hungry-shake {
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-4px) rotate(-2deg); }
@@ -27,14 +23,12 @@
     }
     .hungry { animation: hungry-shake 0.5s infinite; }
 
-    /* Bounce ao comer */
     @keyframes eat-bounce {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.12); }
     }
     .eating { animation: eat-bounce 0.4s ease-in-out infinite; }
 
-    /* Coração flutuante */
     @keyframes heart-float {
       0%   { opacity: 1; transform: translateY(0) scale(1); }
       100% { opacity: 0; transform: translateY(-60px) scale(1.4); }
@@ -46,7 +40,6 @@
       pointer-events: none;
     }
 
-    /* Estrelas noturnas animadas */
     @keyframes twinkle {
       0%, 100% { opacity: 0.2; transform: scale(0.8); }
       50%       { opacity: 1;   transform: scale(1.2); }
@@ -63,13 +56,9 @@
     }
     body.noite .star { display: block; }
 
-    /* Barra de fome animada */
     #hunger-bar { transition: width 0.8s ease; }
-
-    /* Morte - criatura em escala de cinza */
     .morto { filter: grayscale(100%); opacity: 0.7; }
 
-    /* Efeito de ressurreição */
     @keyframes revive {
       0%   { transform: scale(0.5); opacity: 0; filter: brightness(3); }
       60%  { transform: scale(1.2); opacity: 1; }
@@ -81,12 +70,10 @@
 
 <body class="min-h-screen flex flex-col">
 
-  <!-- Estrelas (aparecem à noite) -->
   <div id="stars-container"></div>
 
-  <!-- ===== TOPO: Avatar + Nome + Toggle Dia/Noite ===== -->
+  <!-- TOPO -->
   <div class="w-full flex items-center justify-between p-4 gap-4 z-10">
-    
     <div class="flex items-center gap-3">
       <div class="avatar">
         <div class="w-14 rounded-full ring ring-pink-400 ring-offset-base-100 ring-offset-2 shadow-lg">
@@ -101,34 +88,27 @@
         oninput="atualizarNome()"
       />
     </div>
-
-    <!-- Toggle Dia / Noite -->
     <div class="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-full px-3 py-2 shadow">
       <span class="text-sm">☀️</span>
-      <input
-        type="checkbox"
-        id="toggleNoite"
-        class="toggle toggle-sm toggle-secondary"
-        onchange="alternarModoManual()"
-      />
+      <input type="checkbox" id="toggleNoite" class="toggle toggle-sm toggle-secondary" onchange="alternarModoManual()" />
       <span class="text-sm">🌙</span>
     </div>
   </div>
 
-  <!-- ===== STATUS: nome + barra de fome ===== -->
+  <!-- STATUS -->
   <div class="flex flex-col items-center gap-1 z-10 px-4">
     <p id="nomeDisplay" class="font-bold text-pink-700 text-lg drop-shadow"></p>
     <div class="flex items-center gap-2 w-full max-w-xs">
       <span class="text-sm">🍔</span>
       <div class="flex-1 bg-white/60 rounded-full h-3 overflow-hidden shadow-inner">
-        <div id="hunger-bar" class="h-full rounded-full bg-gradient-to-r from-green-400 to-lime-300" style="width:100%"></div>
+        <div id="hunger-bar" style="height:100%; width:100%; border-radius:9999px; background: linear-gradient(to right, #4ade80, #a3e635);"></div>
       </div>
       <span id="hunger-label" class="text-xs font-semibold text-gray-600">Saciado</span>
     </div>
     <div id="status-badge" class="badge badge-success badge-sm mt-1">😊 Feliz</div>
   </div>
 
-  <!-- ===== CRIATURA ===== -->
+  <!-- CRIATURA -->
   <div class="flex-1 flex flex-col items-center justify-center relative z-10 py-4">
     <div class="relative inline-block">
       <img
@@ -141,8 +121,6 @@
       />
       <div id="hearts-area" class="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"></div>
     </div>
-
-    <!-- Botão de comida -->
     <div class="mt-8 flex flex-col items-center gap-2">
       <p class="text-xs text-gray-500 font-medium">Clique para alimentar</p>
       <img
@@ -155,7 +133,7 @@
     </div>
   </div>
 
-  <!-- ===== RODAPÉ: Tempo + Log ===== -->
+  <!-- RODAPÉ -->
   <div class="w-full flex justify-center pb-4 z-10">
     <div class="bg-white/60 backdrop-blur-sm rounded-2xl px-6 py-2 shadow flex gap-6 items-center">
       <div class="text-center">
@@ -170,7 +148,235 @@
     </div>
   </div>
 
-</body>
+  <!-- SCRIPT INLINE: sem depender de arquivo externo -->
+  <script>
+    // Elementos
+    var img           = document.getElementById("mainImage");
+    var avatarImg     = document.getElementById("avatarImg");
+    var hungerBar     = document.getElementById("hunger-bar");
+    var hungerLabel   = document.getElementById("hunger-label");
+    var statusBadge   = document.getElementById("status-badge");
+    var timerDisp     = document.getElementById("timer-display");
+    var logDisp       = document.getElementById("log-display");
+    var nomeDisplay   = document.getElementById("nomeDisplay");
+    var nomeInput     = document.getElementById("nomeInput");
+    var heartsArea    = document.getElementById("hearts-area");
+    var starsContainer= document.getElementById("stars-container");
+    var toggleNoite   = document.getElementById("toggleNoite");
 
-<script src="script.js"></script>
+    var estados = {
+      normal:  "b_n.png",
+      comendo: "b_co.png",
+      feliz:   "b_fe.png",
+      fome30:  "b_fo.png",
+      fome60:  "b_de.png",
+      morto:   "b_m.png"
+    };
+
+    var fundoDia   = "background.png";
+    var fundoNoite = "background_noite.png";
+
+    var contador        = 0;
+    var tempoVivo       = 0;
+    var estaMorto       = false;
+    var modoNoiteManual = false;
+    var horas           = 0;
+
+    var intervalo     = null;
+    var timeoutClique = null;
+    var timeoutBack   = null;
+    var horasIntervalo= null;
+
+    // ---- CONTROLE PRINCIPAL ----
+    function controle() {
+      if (intervalo) clearInterval(intervalo);
+      intervalo = setInterval(function() {
+        if (estaMorto) return;
+
+        contador++;
+        tempoVivo++;
+        timerDisp.textContent = formatarTempo(tempoVivo);
+        atualizarBarraFome();
+
+        if (contador === 30) {
+          img.src = estados.fome30;
+          avatarImg.src = estados.fome30;
+          img.classList.add("hungry");
+          setStatus("😟 Com fome", "warning");
+          log("Está com fome...");
+        }
+        if (contador === 60) {
+          img.src = estados.fome60;
+          avatarImg.src = estados.fome60;
+          setStatus("😡 Com muita fome", "error");
+          log("Está faminto e bravo!");
+        }
+        if (contador >= 90) {
+          morrer();
+        }
+      }, 1000);
+    }
+
+    // ---- ALIMENTAR ----
+    function alimentar() {
+      if (estaMorto) { ressuscitar(); return; }
+
+      if (timeoutClique) clearTimeout(timeoutClique);
+      if (timeoutBack)   clearTimeout(timeoutBack);
+
+      img.classList.remove("hungry", "eating", "morto");
+      img.src = estados.comendo;
+      avatarImg.src = estados.comendo;
+      img.classList.add("eating");
+
+      contador = 0;
+      log("Nhac nhac! 😋");
+      setStatus("🍓 Comendo!", "success");
+      atualizarBarraFome();
+
+      timeoutClique = setTimeout(function() {
+        img.src = estados.feliz;
+        avatarImg.src = estados.feliz;
+        img.classList.remove("eating");
+        setStatus("😊 Feliz e saciado!", "success");
+        mostrarCoracao();
+        log("Que delícia! 💖");
+
+        timeoutBack = setTimeout(function() {
+          img.src = estados.normal;
+          avatarImg.src = estados.normal;
+          setStatus("😊 Feliz", "success");
+          log("Voltando ao normal...");
+        }, 2000);
+      }, 1000);
+    }
+
+    // ---- MORTE / RESSURREIÇÃO ----
+    function morrer() {
+      estaMorto = true;
+      img.src = estados.morto;
+      avatarImg.src = estados.morto;
+      img.classList.remove("hungry", "eating");
+      img.classList.add("morto");
+      setStatus("💀 Morreu...", "error");
+      log("Morreu! Clique na comida para ressuscitar.");
+      hungerBar.style.width = "0%";
+      hungerLabel.textContent = "Morto";
+    }
+
+    function ressuscitar() {
+      estaMorto = false;
+      contador = 0;
+      img.classList.remove("morto");
+      img.classList.add("reviving");
+      img.src = estados.feliz;
+      avatarImg.src = estados.feliz;
+      setStatus("✨ Ressuscitou!", "success");
+      log("Voltou à vida! 🎉");
+      mostrarCoracao();
+      setTimeout(function() {
+        img.classList.remove("reviving");
+        img.src = estados.normal;
+        avatarImg.src = estados.normal;
+        setStatus("😊 Feliz", "success");
+      }, 1000);
+    }
+
+    function interagir() {
+      if (estaMorto) { log("Está morto... alimente para ressuscitar!"); return; }
+      mostrarCoracao();
+      log("Que fofinho! 💕");
+    }
+
+    // ---- DIA / NOITE ----
+    function aplicarFundo(noite) {
+      document.body.style.backgroundImage = noite
+        ? "url('" + fundoNoite + "')"
+        : "url('" + fundoDia + "')";
+      if (noite) {
+        document.body.classList.add("noite");
+      } else {
+        document.body.classList.remove("noite");
+      }
+      toggleNoite.checked = noite;
+    }
+
+    function alternarModoManual() {
+      modoNoiteManual = toggleNoite.checked;
+      aplicarFundo(modoNoiteManual);
+    }
+
+    function cicloDianoite() {
+      if (horasIntervalo) clearInterval(horasIntervalo);
+      horasIntervalo = setInterval(function() {
+        if (modoNoiteManual) return;
+        horas = (horas + 1) % 24;
+        aplicarFundo(horas >= 12 && horas < 22);
+      }, 3000);
+    }
+
+    // ---- UTILITÁRIOS ----
+    function atualizarBarraFome() {
+      var pct = Math.max(0, 100 - (contador / 90) * 100);
+      hungerBar.style.width = pct + "%";
+      if (pct > 60) {
+        hungerBar.style.background = "linear-gradient(to right, #4ade80, #a3e635)";
+        hungerLabel.textContent = "Saciado";
+      } else if (pct > 30) {
+        hungerBar.style.background = "linear-gradient(to right, #facc15, #fb923c)";
+        hungerLabel.textContent = "Com fome";
+      } else {
+        hungerBar.style.background = "linear-gradient(to right, #ef4444, #f472b6)";
+        hungerLabel.textContent = "Faminto!";
+      }
+    }
+
+    function setStatus(texto, tipo) {
+      var cores = { success: "badge-success", warning: "badge-warning", error: "badge-error" };
+      statusBadge.className = "badge badge-sm mt-1 " + (cores[tipo] || "badge-ghost");
+      statusBadge.textContent = texto;
+    }
+
+    function log(msg) { logDisp.textContent = msg; }
+
+    function formatarTempo(s) {
+      if (s < 60) return s + "s";
+      return Math.floor(s / 60) + "m " + (s % 60) + "s";
+    }
+
+    function mostrarCoracao() {
+      var emojis = ["💖","💕","✨","🌸"];
+      var heart = document.createElement("span");
+      heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      heart.className = "heart-anim";
+      heart.style.left = (Math.random() * 60 - 30) + "px";
+      heartsArea.appendChild(heart);
+      setTimeout(function() { heart.remove(); }, 1200);
+    }
+
+    function atualizarNome() {
+      var nome = nomeInput.value.trim();
+      nomeDisplay.textContent = nome ? "🐾 " + nome : "";
+    }
+
+    function criarEstrelas(n) {
+      for (var i = 0; i < n; i++) {
+        var s = document.createElement("div");
+        s.className = "star";
+        s.style.top  = Math.random() * 100 + "vh";
+        s.style.left = Math.random() * 100 + "vw";
+        s.style.animationDelay = Math.random() * 3 + "s";
+        s.style.animationDuration = (1.5 + Math.random() * 2) + "s";
+        starsContainer.appendChild(s);
+      }
+    }
+
+    // ---- INICIALIZAÇÃO ----
+    criarEstrelas(60);
+    controle();
+    cicloDianoite();
+    log("Olá! Cuide bem de mim 🐣");
+  </script>
+
+</body>
 </html>
