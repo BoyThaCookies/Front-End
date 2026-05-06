@@ -25,3 +25,8 @@ function completar(button){
   const taskComplete = button.parentElement;
   taskComplete.classList.toggle('completed');
 }
+
+function Editar(button){
+  const taskEdit = button.parentElement;
+  const newText = prompt('Editar', taskText);
+}
