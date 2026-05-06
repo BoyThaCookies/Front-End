@@ -28,5 +28,6 @@ function completar(button){
 
 function Editar(button){
   const taskEdit = button.parentElement;
+  const taskText = taskEdit.querySelector('span').innerText;
   const newText = prompt('Editar', taskText);
 }
