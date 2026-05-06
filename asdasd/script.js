@@ -8,7 +8,7 @@ function addTask() {
     newTask.innerHTML = `
     <span>${taskItem}</span>
     <button onclick="completar(this)"> Concluir </button>
-    <button onclick="Editar()"> Editar </button>
+    <button onclick="editar(this)"> Editar </button>
     <button onclick="delet(this)"> Remover </button>
     `;
     taskList.appendChild(newTask);
@@ -26,7 +26,7 @@ function completar(button){
   taskComplete.classList.toggle('completed');
 }
 
-function Editar(button){
+function editar(button){
   const taskEdit = button.parentElement;
   const taskText = taskEdit.querySelector('span').innerText;
   const newText = prompt('Editar', taskText);
