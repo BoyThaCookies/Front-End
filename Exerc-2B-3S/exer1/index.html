@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validador de CPF</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <body>
+
+  <div class="card">
+    <div class="tag">Exercício 01</div>
+    <h1>Validador de CPF</h1>
+    <p class="subtitle">Verificação por dígitos verificadores</p>
+ 
+    <label for="cpf">Número do CPF</label>
+    <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
+ 
+    <button onclick="validarCPF()">Validar</button>
+ 
+    <div class="result" id="result"></div>
+  </div>
+  <script src="script.js" defer></script>
+  </body>
+</html>
